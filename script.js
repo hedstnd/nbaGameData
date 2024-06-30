@@ -172,7 +172,7 @@ function pitchDisplay(game) {
 	try {
 		document.getElementById(tm.homeAway+"WPImg").src = tm.team.logos[3].href;
 	} catch (err) {
-		document.getElementById(tm.homeAway+"WPImg").src = tm.team.logos[].href;
+		document.getElementById(tm.homeAway+"WPImg").src = tm.team.logos[1].href;
 	}
 	try {
 		r.style.setProperty("--"+tm.homeAway+"Logo","url('"+(tm.team.logos[1].href) + "')");
