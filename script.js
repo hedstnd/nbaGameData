@@ -67,6 +67,10 @@ window.onload = function() {
 					} else {
 						if (g2.includes(g[j])) {
 							game.setAttribute("onclick","runGD(\""+baseU2+"summary?event="+g[j].id+"\")");
+						} else if (g4.includes(g[j])) {
+							game.setAttribute("onclick","runGD(\""+baseU3+"summary?event="+g[j].id+"\")");
+						} else if (g5.includes(g[j])) {
+							game.setAttribute("onclick","runGD(\""+baseU4+"summary?event="+g[j].id+"\")");
 						} else {
 							game.setAttribute("onclick","runGD(\""+baseURL+"summary?event="+g[j].id+"\")");
 						}
@@ -135,7 +139,11 @@ function pitchDisplay(game) {
 	try {
 		wp.home = Math.round(game.winprobability.pop().homeWinPercentage * 1000)/10;
 	} catch (err) {
-		wp.home = game.predictor.homeTeam.gameProjection;
+		try {
+			wp.home = game.predictor.homeTeam.gameProjection;
+		} catch(e2) {
+			wp.home = 50;
+		}
 	}
 	wp.away = Math.round((100-wp.home)*10)/10;
 	for (var i = 0; i < 2; i++) {
