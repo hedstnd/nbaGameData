@@ -4,6 +4,8 @@ var timeOffset = (new Date()).getTimezoneOffset() / 60;
 var twos = ["home","away"];
 const baseURL = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/";
 const baseU2 = "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/";
+const baseU3 = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba-summer-las-vegas/";
+const baseU4 = "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-olympics-basketball/";
 var vars;
 var uRL;
 var hideCode = "";
@@ -11,10 +13,14 @@ var d = new Date();
 d.setHours(d.getHours() - timeOffset);
 var r = document.querySelector(':root');
 window.onload = function() {
-	getData(baseURL + "scoreboard?dates="+ d.toISOString().substring(0,10).replaceAll("-","")).then((value) => {
-		getData(baseU2 + "scoreboard?dates="+ d.toISOString().substring(0,10).replaceAll("-","")).then((val2) => {
+	getData(baseURL + "scoreboard").then((value) => {
+		getData(baseU2 + "scoreboard").then((val2) => {
+			getData(baseU3 + "scoreboard").then((val3) => {
+				getData(baseU4+"scoreboard").then((val4) => {
 		console.log(value);
 		console.log(val2);
+		console.log(val3);
+		console.log(val4);
 		if (value.events.length > 0) {
 			g3 = value.events.filter(e => e.status.type.state == "in");
 		} else {
@@ -25,7 +31,17 @@ window.onload = function() {
 		} else {
 			g2 = [];
 		}
-		g = g3.concat(g2);
+		if (val3.events.length > 0) {
+			g4 = val3.events.filter(e=> e.status.type.state == "in");
+		} else {
+			g4= [];
+		}
+		if (val4.events.length > 0) {
+			g5 = val4.events.filter(e=> e.status.type.state == "in");
+		} else {
+			g5 = [];
+		}
+		g = g3.concat(g2,g4,g5);
 		tab = document.createElement("table");
 		for (var i = 0; i < g.length/4; i++) {
 			row = document.createElement("tr");
@@ -80,7 +96,7 @@ window.onload = function() {
 		if (g.length == 0) {
 			document.getElementById("scores").innerHTML += "<table><td>No active games</td></table>";
 		}
-	});});
+});});});});
 }
 function gameDay() {
 	url = uRL;
