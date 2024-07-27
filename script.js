@@ -163,7 +163,13 @@ function pitchDisplay(game) {
 			} else {
 				document.getElementById(tm.homeAway+"Name").innerHTML = tm.team.name;
 			}
-			document.getElementById(tm.homeAway+"Score").innerHTML = lastPlay[tm.homeAway+"Score"] || (tm.score || "");
+			var lpScore;
+			if (lastPlay) {
+				lpScore = lastPlay[tm.homeAway+"Score"];
+			} else {
+				lpScore = tm.score || "";
+			}
+			document.getElementById(tm.homeAway+"Score").innerHTML = lpScore;
 			// top.before(wP);
 			// document.getElementById(tm.homeAway+"WPSpan").value=valCM.awayWinProbability;
 		if (wp[tm.homeAway] <= 2) {
@@ -196,7 +202,11 @@ function pitchDisplay(game) {
 	try {
 		document.getElementById(tm.homeAway+"WPImg").src = tm.team.logos[3].href;
 	} catch (err) {
-		document.getElementById(tm.homeAway+"WPImg").src = tm.team.logos[1].href;
+		try {
+			document.getElementById(tm.homeAway+"WPImg").src = tm.team.logos[1].href;
+		} catch (e2) {
+			document.getElementById(tm.homeAway+"WPImg").src = tm.team.logos[0].href;
+		}
 	}
 	try {
 		r.style.setProperty("--"+tm.homeAway+"Logo","url('"+(tm.team.logos[1].href) + "')");
@@ -292,10 +302,14 @@ function pitchDisplay(game) {
 	}
 	}
 	var timeLeft = "";
-	if (lastPlay.clock && lastPlay.clock.displayValue == "0:00") {
-		timeLeft = "End " + lastPlay.period.displayValue;
-	} else if (lastPlay.clock) {
-		timeLeft+= lastPlay.clock.displayValue + " " + lastPlay.period.displayValue;
+	try {
+		if (lastPlay.clock && lastPlay.clock.displayValue == "0:00") {
+			timeLeft = "End " + lastPlay.period.displayValue;
+		} else if (lastPlay.clock) {
+			timeLeft+= lastPlay.clock.displayValue + " " + lastPlay.period.displayValue;
+		}
+	} catch (err) {
+		timeLeft = game.header.competitions[0].status.type.detail;
 	}
 	var timeSpl = [timeLeft.substring(0,timeLeft.length/2),timeLeft.substring(timeLeft.length/2)];
 	document.getElementById("awayDesc").innerText = timeSpl[0];
