@@ -275,7 +275,11 @@ function pitchDisplay(game) {
 		try {
 			document.getElementById(tm.homeAway+"P"+(j+1)).innerHTML = "<span id=\""+tm.homeAway+"P"+(j+1)+"Num\" class=\""+tm.homeAway+"Num\"></span><span id=\""+tm.homeAway+"P"+(j+1)+"Pos\" class=\""+tm.homeAway+"Pos\"></span>"+"<img src=\""+onCourt[j].athlete.headshot.href+"\" alt=\""+onCourt[j].athlete.headshot.alt+"\"><br/>"+onCourt[j].athlete.headshot.alt;
 		} catch(err) {
-			document.getElementById(tm.homeAway+"P"+(j+1)).innerHTML = "<span id=\""+tm.homeAway+"P"+(j+1)+"Num\" class=\""+tm.homeAway+"Num\"></span><span id=\""+tm.homeAway+"P"+(j+1)+"Pos\" class=\""+tm.homeAway+"Pos\"></span>" + "<img src=\"\" alt=\""+onCourt[j].athlete.displayName+"\" class=\"noImg\">";
+			try {
+				document.getElementById(tm.homeAway+"P"+(j+1)).innerHTML = "<span id=\""+tm.homeAway+"P"+(j+1)+"Num\" class=\""+tm.homeAway+"Num\"></span><span id=\""+tm.homeAway+"P"+(j+1)+"Pos\" class=\""+tm.homeAway+"Pos\"></span>" + "<img src=\""+nbaHeadshot(onCourt[j].athlete.id)+"\" alt=\" \"><br/>"+onCourt[j].athlete.displayName;
+			} catch (e2) {
+				document.getElementById(tm.homeAway+"P"+(j+1)).innerHTML = "<span id=\""+tm.homeAway+"P"+(j+1)+"Num\" class=\""+tm.homeAway+"Num\"></span><span id=\""+tm.homeAway+"P"+(j+1)+"Pos\" class=\""+tm.homeAway+"Pos\"></span>" + "<img src=\""+nbaHeadshot(onCourt[j].athlete.id)+"\" alt=\""+onCourt[j].athlete.shortName+"\" class=\"noImg\"><br/>"+onCourt[j].athlete.displayName;
+			}
 		}
 		document.getElementById(tm.homeAway+"P"+(j+1)).innerHTML+= "<br/>"+onCourt[j].stats[ptsKey] + " PTS " + onCourt[j].stats[rebKey]+ " REB " + onCourt[j].stats[astKey] + " AST";
 		if (onCourt[j].stats[blkKey] > 2) {
@@ -697,4 +701,7 @@ function showSett() {
 }
 function closeSett() {
 	document.getElementById("sett").style.display = "none";
+}
+function nbaHeadshot(id) {
+	return "https://a.espncdn.com/i/headshots/nba/players/full/"+id+".png";
 }

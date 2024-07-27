@@ -12,6 +12,7 @@
 }
 .noImg {
 	width: 13dvh !important;
+	height: auto !important;
 }
 .home img, .away img {
 	height: 13dvh;
