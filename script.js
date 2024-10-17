@@ -9,6 +9,7 @@ const baseU4 = "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-ol
 var vars;
 var uRL;
 var hideCode = "";
+var wlSupp = false;
 var d = new Date();
 d.setHours(d.getHours() - timeOffset);
 var r = document.querySelector(':root');
@@ -128,7 +129,23 @@ function runGD(url, desc="") {
 	}
 	run = setInterval(gameDay,5000);
 }
-function pitchDisplay(game) {
+async function pitchDisplay(game) {
+	try {
+		if (!wlSupp && game.header.competitions[0].status.type.state == "in") {
+			wlSupp = true;
+			wakeLock = await navigator.wakeLock.request("screen");
+			wakeLock.addEventListener("release", () => {
+				// the wake lock has been released
+				console.log("Wake Lock has been released");
+				});
+			console.log("Wake Lock is active!");
+		} else if (wlSupp && game.header.competitions[0].status.type.state != "in") {
+			wakeLock.release();
+		}
+	} catch (err) {
+		// The Wake Lock request has failed - usually system related, such as battery.
+		console.log(err);
+	}
 	var lastPlay;
 	try {
 		lastPlay = game.plays.pop();
@@ -146,6 +163,9 @@ function pitchDisplay(game) {
 		}
 	}
 	wp.away = Math.round((100-wp.home)*10)/10;
+	var popUp = document.getElementById("popText");
+	await timeout(document.getElementById("offset").value * 1000);
+	document.getElementsByClassName("showSett")[0].style = "";
 	for (var i = 0; i < 2; i++) {
 		var tm = game.header.competitions[0].competitors[i];
 		var wProbText = tm.team.abbreviation +  " Win&nbsp;Probability:&nbsp;";
@@ -181,7 +201,6 @@ function pitchDisplay(game) {
 			document.getElementById(tm.homeAway+"WPImg").style.width = "3dvh";
 		}
 	
-	// var popUp = document.getElementById("popText");
 	// setTimeout(() => {}, document.getElementById("offset").value * 1000);
 	// if (game.gameData.status.statusCode != "I" && game.gameData.status.statusCode != "PW" && game.gameData.status.statusCode != hideCode) {
 		// popUp.parentElement.style.display = "block";
@@ -275,11 +294,11 @@ function pitchDisplay(game) {
 		try {
 			document.getElementById(tm.homeAway+"P"+(j+1)).innerHTML = "<span id=\""+tm.homeAway+"P"+(j+1)+"Num\" class=\""+tm.homeAway+"Num\"></span><span id=\""+tm.homeAway+"P"+(j+1)+"Pos\" class=\""+tm.homeAway+"Pos\"></span>"+"<img src=\""+onCourt[j].athlete.headshot.href+"\" alt=\""+onCourt[j].athlete.headshot.alt+"\"><br/>"+onCourt[j].athlete.headshot.alt;
 		} catch(err) {
-			try {
-				document.getElementById(tm.homeAway+"P"+(j+1)).innerHTML = "<span id=\""+tm.homeAway+"P"+(j+1)+"Num\" class=\""+tm.homeAway+"Num\"></span><span id=\""+tm.homeAway+"P"+(j+1)+"Pos\" class=\""+tm.homeAway+"Pos\"></span>" + "<img src=\""+nbaHeadshot(onCourt[j].athlete.id)+"\" alt=\" \"><br/>"+onCourt[j].athlete.displayName;
-			} catch (e2) {
-				document.getElementById(tm.homeAway+"P"+(j+1)).innerHTML = "<span id=\""+tm.homeAway+"P"+(j+1)+"Num\" class=\""+tm.homeAway+"Num\"></span><span id=\""+tm.homeAway+"P"+(j+1)+"Pos\" class=\""+tm.homeAway+"Pos\"></span>" + "<img src=\""+nbaHeadshot(onCourt[j].athlete.id)+"\" alt=\""+onCourt[j].athlete.shortName+"\" class=\"noImg\"><br/>"+onCourt[j].athlete.displayName;
-			}
+			// try {
+				// document.getElementById(tm.homeAway+"P"+(j+1)).innerHTML = "<span id=\""+tm.homeAway+"P"+(j+1)+"Num\" class=\""+tm.homeAway+"Num\"></span><span id=\""+tm.homeAway+"P"+(j+1)+"Pos\" class=\""+tm.homeAway+"Pos\"></span>" + "<img src=\""+nbaHeadshot(onCourt[j].athlete.id)+"\" alt=\" \"><br/>"+onCourt[j].athlete.displayName;
+			// } catch (e2) {
+				document.getElementById(tm.homeAway+"P"+(j+1)).innerHTML = "<span id=\""+tm.homeAway+"P"+(j+1)+"Num\" class=\""+tm.homeAway+"Num\"></span><span id=\""+tm.homeAway+"P"+(j+1)+"Pos\" class=\""+tm.homeAway+"Pos\"></span>" + "<img src=\"\" alt=\""+onCourt[j].athlete.shortName+"\" class=\"noImg\"><br/>"+onCourt[j].athlete.displayName;
+			// }
 		}
 		document.getElementById(tm.homeAway+"P"+(j+1)).innerHTML+= "<br/>"+onCourt[j].stats[ptsKey] + " PTS " + onCourt[j].stats[rebKey]+ " REB " + onCourt[j].stats[astKey] + " AST";
 		if (onCourt[j].stats[blkKey] > 2) {
@@ -704,4 +723,7 @@ function closeSett() {
 }
 function nbaHeadshot(id) {
 	return "https://a.espncdn.com/i/headshots/nba/players/full/"+id+".png";
+}
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
